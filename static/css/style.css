@@ -1,0 +1,339 @@
+/* static/css/style.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #1DB954; /* Spotify Green */
+    --primary-hover-color: #18a04a;
+    --secondary-color: #FF0000; /* YouTube Red */
+    --accent-color: #2c7be5; /* A calm blue for secondary actions/links */
+
+    --background-color: #f4f7f9; /* Very light, slightly cool gray */
+    --card-background-color: #ffffff;
+    --text-primary-color: #333a45; /* Darker, more neutral text */
+    --text-secondary-color: #5f6c7b; /* Softer secondary text */
+    --border-color: #e3e9ef;
+    --input-bg-color: #fcfdff;
+    --input-focus-color: var(--primary-color);
+    --input-focus-shadow: rgba(29, 185, 84, 0.1);
+
+    --success-color: #28a745; /* Bootstrap's success green */
+    --warning-color: #ffc107; /* Bootstrap's warning yellow */
+    --error-color: #dc3545;   /* Bootstrap's danger red */
+    --info-color: #17a2b8;    /* Bootstrap's info cyan */
+
+    --font-family-sans-serif: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --box-shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --box-shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.08);
+    --border-radius-sm: 0.25rem; /* 4px */
+    --border-radius-md: 0.5rem; /* 8px */
+    --border-radius-lg: 0.75rem; /* 12px */
+}
+
+body {
+    font-family: var(--font-family-sans-serif);
+    background-color: var(--background-color);
+    color: var(--text-primary-color);
+    line-height: 1.65;
+    font-weight: 400; /* Default to regular */
+}
+
+.page-container {
+    max-width: 1400px; /* Allow wider content */
+    margin: 0 auto;
+    padding: 2rem 1.5rem; /* Padding for the overall page */
+}
+
+.main-content-wrapper {
+    background-color: var(--card-background-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--box-shadow-medium);
+    padding: 2.5rem 3rem;
+    display: flex; /* For two-column layout */
+    gap: 3rem; /* Space between columns */
+}
+
+.conversion-column {
+    flex: 3; /* Takes up more space */
+}
+
+.info-column {
+    flex: 2; /* Takes up less space */
+    padding-top: 1rem; /* Align a bit with form */
+    border-left: 1px solid var(--border-color);
+    padding-left: 2.5rem;
+}
+
+
+.app-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.app-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.8rem;
+    color: var(--text-primary-color);
+    text-align: left; /* Align to left in the new layout */
+}
+.app-title .fa-sync-alt {
+    margin-right: 0.75rem;
+    color: var(--primary-color);
+}
+
+.spotify-brand { color: var(--primary-color); }
+.youtube-brand { color: var(--secondary-color); }
+
+.form-section-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary-color);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text-secondary-color);
+    font-size: 0.9rem; /* Slightly smaller label */
+    margin-bottom: 0.35rem;
+}
+.form-label .fas, .form-label .fab {
+    margin-right: 0.4rem;
+    width: 1em; /* Consistent icon width */
+    color: var(--text-secondary-color);
+}
+
+
+.form-control, .form-select {
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    color: var(--text-primary-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-weight: 400;
+}
+
+.form-control::placeholder {
+    color: #9aabb9;
+    font-weight: 300;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--input-focus-color);
+    box-shadow: 0 0 0 3px var(--input-focus-shadow); /* Thinner shadow */
+    background-color: var(--card-background-color);
+}
+
+.btn-convert {
+    background-image: linear-gradient(to right, #1DB954, #18a04a); /* Subtle gradient */
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 0.8rem 1.75rem;
+    font-size: 1rem;
+    border-radius: var(--border-radius-md);
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(29, 185, 84, 0.2);
+}
+
+.btn-convert:hover {
+    background-image: linear-gradient(to right, #18a04a, #1DB954);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+}
+.btn-convert:active { transform: translateY(0px); box-shadow: 0 2px 8px rgba(29, 185, 84, 0.2); }
+.btn-convert:disabled {
+    background-image: none;
+    background-color: #ced4da;
+    border-color: #ced4da;
+    box-shadow: none;
+    transform: translateY(0px);
+}
+.btn-convert .spinner-border { margin-right: 0.6rem; }
+
+
+.btn-view-playlist {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+    font-weight: 500;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    border-radius: var(--border-radius-md);
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+    text-decoration: none; /* For <a> tag */
+    display: inline-flex; /* For icon alignment */
+    align-items: center;
+    margin-top: 1rem;
+}
+.btn-view-playlist:hover {
+    background-color: #246ac7;
+    border-color: #246ac7;
+    color: white;
+    transform: translateY(-1px);
+}
+.btn-view-playlist .fab, .btn-view-playlist .fas { margin-right: 0.5rem; }
+
+
+#progressAreaContainer {
+    margin-top: 1rem; /* Reduced margin as title is separate */
+    padding: 1.25rem;
+    background-color: #f8f9fc;
+    border: 1px solid var(--border-color);
+    height: 350px;
+    overflow-y: auto;
+    border-radius: var(--border-radius-md);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 0.875rem;
+    line-height: 1.75;
+}
+#progressAreaContainer p {
+    margin-bottom: 0.5em;
+    word-break: break-word;
+    display: flex;
+    align-items: flex-start;
+    opacity: 0;
+    animation: fadeInMessage 0.4s ease-out forwards;
+    color: var(--text-secondary-color); /* Default progress text color */
+}
+#progressAreaContainer p .fas, #progressAreaContainer p .far, #progressAreaContainer p .fab {
+    margin-right: 0.65rem;
+    margin-top: 0.2em;
+    font-size: 0.95em;
+    width: 1.1em;
+    text-align: center;
+    color: var(--text-secondary-color); /* Default icon color */
+}
+
+@keyframes fadeInMessage { to { opacity: 1; } }
+
+.auth-status {
+    font-size: 0.9rem;
+    padding: 0.75rem 1.1rem;
+    margin-bottom: 1.5rem; /* Reduced margin */
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    border-width: 1px;
+    border-style: solid;
+}
+.auth-status .fas { margin-right: 0.6rem; font-size: 1rem; }
+
+.auth-status.alert-success { border-color: var(--success-color); background-color: #eaf6ec; color: #218838; }
+.auth-status.alert-success .fas { color: var(--success-color); }
+.auth-status.alert-warning { border-color: var(--warning-color); background-color: #fff8e1; color: #b98700; }
+.auth-status.alert-warning .fas { color: var(--warning-color); }
+.auth-status.alert-danger { border-color: var(--error-color); background-color: #fbebeb; color: #c82333;}
+.auth-status.alert-danger .fas { color: var(--error-color); }
+
+
+.info-column h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary-color);
+    margin-bottom: 1rem;
+}
+.info-column h3 .fas {
+    margin-right: 0.5rem;
+    color: var(--accent-color);
+}
+
+.info-column p, .info-column ul li {
+    font-size: 0.9rem;
+    color: var(--text-secondary-color);
+    margin-bottom: 0.75rem;
+}
+.info-column strong {
+    font-weight: 500;
+    color: var(--text-primary-color);
+}
+.info-column ul {
+    padding-left: 1.25rem;
+    list-style-type: none; /* Remove default bullets */
+}
+.info-column ul li::before {
+    content: "\f058"; /* Font Awesome check circle solid */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900; /* For solid icons */
+    color: var(--primary-color);
+    margin-right: 0.5rem;
+    font-size: 0.85em;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1.2em; /* Pull back into list flow */
+}
+
+
+/* Progress Message Specific Styling */
+.progress-message.fatal-error-message, .progress-message.error-message { color: var(--error-color); }
+.progress-message.fatal-error-message .fas, .progress-message.error-message .fas { color: var(--error-color); }
+
+.progress-message.success-message { color: var(--success-color); }
+.progress-message.success-message .fas, .progress-message.success-message .fab { color: var(--success-color); }
+
+.progress-message.warning-message { color: var(--warning-color); }
+.progress-message.warning-message .fas { color: var(--warning-color); }
+
+.progress-message.info-message { color: var(--text-secondary-color); }
+.progress-message.info-message .fas, .progress-message.info-message .fab { color: var(--info-color); }
+
+.progress-message.debug-message { color: #a0aec0; font-style: italic; }
+.progress-message.debug-message .fas { color: #a0aec0; }
+
+
+#playlistLinkContainer {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #e6f7ff; /* Light blue background for the link area */
+    border: 1px solid #b3e0ff;
+    border-radius: var(--border-radius-md);
+    text-align: center;
+    display: none; /* Initially hidden */
+}
+#playlistLinkContainer p {
+    margin-bottom: 0.75rem;
+    color: var(--text-primary-color);
+    font-weight: 500;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 992px) { /* Bootstrap's lg breakpoint */
+    .main-content-wrapper {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    .info-column {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid var(--border-color);
+        padding-top: 2rem;
+        margin-top: 1rem;
+    }
+    .page-container {
+        padding: 1.5rem 1rem;
+    }
+    .app-header {
+        text-align: center;
+    }
+    .app-title {
+         font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 768px) { /* md breakpoint */
+    .main-content-wrapper {
+        padding: 2rem 1.5rem;
+    }
+    .app-title {
+        font-size: 1.5rem;
+    }
+    .btn-convert {
+        font-size: 0.95rem;
+        padding: 0.7rem 1.5rem;
+    }
+}

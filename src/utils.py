@@ -3,52 +3,63 @@ from typing import Optional
 
 def extract_playlist_id_from_url(url: str) -> Optional[str]:
     """
-    Extracts the Spotify playlist ID from a URL.
-    Handles various Spotify playlist URL formats.
-    Example URLs:
-    - https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M
-    - spotify:playlist:37i9dQZF1DXcBWIGoYBM5M
-    - https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M?si=somethingsomething
+    Extracts the Spotify playlist ID from various URL formats or returns the ID if already provided.
+
+    Args:
+        url (str): The Spotify playlist URL or ID string.
+
+    Returns:
+        Optional[str]: The 22-character Spotify playlist ID, or None if not found or invalid.
     """
     if not isinstance(url, str):
         return None
-        
-    # Regex to find the playlist ID in common Spotify URL formats
-    # It looks for 'playlist/' followed by an ID, or 'playlist:' followed by an ID
-    match = re.search(r"(?:playlist/|playlist:)([a-zA-Z0-9]{22})", url) # Spotify IDs are typically 22 chars
+
+    # Regex to find the 22-character ID after 'playlist/' or 'playlist:'
+    match = re.search(r"(?:playlist/|playlist:)([a-zA-Z0-9]{22})", url)
     if match:
         return match.group(1)
-    
-    # If it's just an ID (alphanumeric, 22 characters), assume it's valid
+
+    # If the input is just the 22-character ID
     if re.fullmatch(r"[a-zA-Z0-9]{22}", url):
         return url
-        
+
     return None
 
 def sanitize_filename(name: str) -> str:
-    """Removes characters that are problematic for filenames and limits length."""
+    """
+    Sanitizes a string to be used as a safe filename.
+
+    Removes problematic characters, replaces multiple spaces with a single space,
+    strips leading/trailing whitespace, and truncates the name to 100 characters.
+
+    Args:
+        name (str): The original string to sanitize.
+
+    Returns:
+        str: The sanitized filename string. Returns "Invalid Playlist Name" if input is not a string.
+    """
     if not isinstance(name, str):
         return "Invalid Playlist Name"
-        
-    # Remove most non-alphanumeric characters except spaces, hyphens, underscores, parentheses
+
+    # Remove characters that are not alphanumeric, spaces, hyphens, or parentheses
     name = re.sub(r'[^\w\s\-\(\)]', '', name)
-    # Replace multiple spaces with a single space
+    # Replace multiple spaces with a single space and strip leading/trailing whitespace
     name = re.sub(r'\s+', ' ', name).strip()
-    # Limit length (YouTube playlist titles have a limit, e.g., 150 chars, be conservative)
+    # Truncate to 100 characters to avoid excessively long filenames
     return name[:100]
 
 if __name__ == '__main__':
-    # Test cases for extract_playlist_id_from_url
+    # --- Test cases for extract_playlist_id_from_url ---
     urls_to_test = [
         "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
         "spotify:playlist:37i9dQZF1DXcBWIGoYBM5M",
-        "https://open.spotify.com/playlist/123abcXYZsomenewid12345?si=qwerty", # 22 char ID
-        "37i9dQZF1DXcBWIGoYBM5M", # Just the ID
-        "https://open.spotify.com/album/0sNOF9WDwhWunNAHPD3qjc", # Album URL (should fail)
-        "invalid_url_string", # Invalid string (should fail)
-        "https://open.spotify.com/user/spotify/playlist/37i9dQZF1DXcBWIGoYBM5M", # User specific URL
-        None, # Test None input
-        12345 # Test non-string input
+        "https://open.spotify.com/playlist/123abcXYZsomenewid12345?si=qwerty",
+        "37i9dQZF1DXcBWIGoYBM5M",
+        "https://open.spotify.com/album/0sNOF9WDwhWunNAHPD3qjc", # Should not match playlist ID
+        "invalid_url_string",
+        "https://open.spotify.com/user/spotify/playlist/37i9dQZF1DXcBWIGoYBM5M",
+        None, # Test with None input
+        12345 # Test with non-string input
     ]
 
     print("Testing extract_playlist_id_from_url:")
@@ -57,13 +68,14 @@ if __name__ == '__main__':
         print(f"URL: '{url}' -> ID: '{playlist_id}'")
 
     print("\nTesting sanitize_filename:")
+    # --- Test cases for sanitize_filename ---
     filenames_to_test = [
         "My Awesome! Playlist*",
         "Song Title / Remix (feat. Artist) & More stuff here to test the length limit just in case it is very very very very very very very very very very very very very very very long",
         "  Extra   Spaces  ",
         "Test (Parentheses)",
-        None,
-        123
+        None, # Test with None input
+        123 # Test with non-string input
     ]
     for name in filenames_to_test:
         sanitized = sanitize_filename(name)

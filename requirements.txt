@@ -1,3 +1,8 @@
+# It is highly recommended to pin your dependencies for reproducible builds.
+# After installing these packages in your virtual environment, run:
+# pip freeze > requirements.txt
+# This will replace the content below with specific versions like Flask==2.0.1.
+
 spotipy
 google-api-python-client
 google-auth-oauthlib

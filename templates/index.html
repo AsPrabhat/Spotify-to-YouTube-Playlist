@@ -3,203 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify to YouTube Playlist Converter</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; margin: 0; padding: 0; background-color: #f0f2f5; color: #1c1e21; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding-top: 20px; padding-bottom: 20px; }
-        .container { background-color: #fff; padding: 25px 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1); max-width: 600px; width: 100%; margin: 0 15px; }
-        h1 { color: #1DB954; /* Spotify Green */ text-align: center; margin-bottom: 10px; font-size: 24px; }
-        h2 { color: #FF0000; /* YouTube Red */ margin-top: 25px; margin-bottom: 10px; font-size: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;}
-        label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #606770;}
-        input[type="text"], input[type="url"], select {
-            width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 15px;
-        }
-        input:focus, select:focus { border-color: #1877f2; box-shadow: 0 0 0 2px #e7f3ff; outline: none;}
-        button {
-            background-color: #1DB954; color: white; padding: 10px 20px;
-            border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;
-            margin-top: 25px; width: 100%; transition: background-color 0.2s;
-        }
-        button:hover { background-color: #1aa34a; }
-        button:disabled { background-color: #ccd0d5; color: #8d949e; cursor: not-allowed;}
-        #progressArea {
-            margin-top: 10px; padding: 12px; border: 1px solid #dddfe2;
-            background-color: #f7f7f7; height: 300px; overflow-y: scroll;
-            white-space: pre-wrap; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-            font-size: 13px; line-height: 1.6; border-radius: 6px;
-        }
-        .note { font-size: 0.85em; color: #606770; margin-top: 10px; line-height: 1.5; }
-        .auth-status { margin-bottom: 20px; padding: 10px 15px; border-radius: 6px; font-size: 14px; text-align: center; }
-        .auth-status.authorized { background-color: #e6ffed; border: 1px solid #a1dea7; color: #246b34;}
-        .auth-status.not-authorized { background-color: #ffebee; border: 1px solid #f5c6cb; color: #721c24;}
-        .error-message { color: #721c24; font-weight: bold; }
-        .success-message { color: #246b34; font-weight: bold; }
-        .info-message { color: #0c5460; }
-        .warning-message { color: #856404; }
-        .fatal-error-message { color: #dc3545; font-weight: bold; text-transform: uppercase; }
-    </style>
+    <title>Playlist Transfer | Spotify to YouTube</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Font Awesome (for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Custom CSS (includes Google Fonts) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Spotify to YouTube Converter</h1>
+    <div class="page-container">
+        <header class="app-header">
+            <h1 class="app-title">
+                <i class="fas fa-sync-alt"></i> Playlist Transfer: <span class="spotify-brand">Spotify</span> to <span class="youtube-brand">YouTube</span>
+            </h1>
+        </header>
 
-        <div id="ytAuthStatus" class="auth-status">Checking YouTube authorization...</div>
+        <div id="ytAuthStatus" class="auth-status alert mb-4" role="alert">
+            <i class="fas fa-spinner fa-spin me-2"></i>Verifying YouTube authorization status...
+        </div>
 
-        <form id="conversionForm">
-            <label for="spotify_url">Spotify Playlist URL or ID:</label>
-            <input type="url" id="spotify_url" name="spotify_url" required placeholder="https://open.spotify.com/playlist/..." aria-describedby="spotify_url_note">
-            <small id="spotify_url_note" class="note">Enter the full URL or just the ID of a public Spotify playlist.</small>
+        <div class="main-content-wrapper">
+            <div class="conversion-column">
+                <form id="conversionForm">
+                    <h2 class="form-section-title">Conversion Details</h2>
+                    <div class="mb-3">
+                        <label for="spotify_url" class="form-label"><i class="fab fa-spotify"></i>Spotify Playlist URL or ID</label>
+                        <input type="text" class="form-control" id="spotify_url" name="spotify_url" required placeholder="Enter Spotify playlist link or ID">
+                    </div>
 
-            <label for="yt_playlist_name">New YouTube Playlist Name (Optional):</label>
-            <input type="text" id="yt_playlist_name" name="yt_playlist_name" placeholder="e.g., My Awesome Mix (on YouTube)" aria-describedby="yt_playlist_name_note">
-            <small id="yt_playlist_name_note" class="note">If blank, a name is generated from the Spotify playlist title.</small>
+                    <div class="mb-3">
+                        <label for="yt_playlist_name" class="form-label"><i class="fab fa-youtube"></i>New YouTube Playlist Name <small class="text-muted fw-normal">(Optional)</small></label>
+                        <input type="text" class="form-control" id="yt_playlist_name" name="yt_playlist_name" placeholder="Defaults to Spotify playlist name">
+                    </div>
 
-            <label for="yt_privacy">YouTube Playlist Privacy:</label>
-            <select id="yt_privacy" name="yt_privacy">
-                <option value="private" selected>Private (Only you can see)</option>
-                <option value="unlisted">Unlisted (Anyone with the link can see)</option>
-                <option value="public">Public (Anyone can search and see)</option>
-            </select>
+                    <div class="mb-4">
+                        <label for="yt_privacy" class="form-label"><i class="fas fa-shield-alt"></i>YouTube Playlist Privacy</label>
+                        <select class="form-select" id="yt_privacy" name="yt_privacy">
+                            <option value="private" selected>Private (Only you can see)</option>
+                            <option value="unlisted">Unlisted (Anyone with the link)</option>
+                            <option value="public">Public (Anyone can search and see)</option>
+                        </select>
+                    </div>
 
-            <button type="submit" id="submitButton">Convert Playlist</button>
-        </form>
+                    <div class="d-grid mt-4">
+                        <button type="submit" id="submitButton" class="btn btn-convert">
+                            <i class="fas fa-magic me-2"></i>Start Conversion
+                        </button>
+                    </div>
+                </form>
 
-        <h2>Conversion Progress:</h2>
-        <div id="progressArea">Waiting for conversion to start...</div>
-        <p class="note">
-            <strong>API Quotas:</strong> This tool uses the YouTube Data API, which has daily usage limits (default: 10,000 units/day).
-            Each song search and add consumes quota. Very large playlists might hit this limit.
-            If quota errors occur, please try again after it resets (usually daily PST).
-        </p>
-         <p class="note">
-            <strong>First-time YouTube Use:</strong> If this is your first time or authorization expired,
-            a browser window/tab should open asking you to log in to Google and grant permissions
-            when you start the conversion. Please complete this to allow the app to access YouTube.
-        </p>
+                <hr class="my-4">
+
+                <div>
+                    <h2 class="form-section-title mb-3"><i class="fas fa-tasks me-2"></i>Live Progress</h2>
+                    <div id="progressAreaContainer" tabindex="0">
+                        <p class="text-muted"><i class="fas fa-hourglass-half me-2"></i>Waiting for conversion to start...</p>
+                    </div>
+                     <div id="playlistLinkContainer" class="mt-3">
+                        <!-- Button will be injected here by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <aside class="info-column">
+                <h3><i class="fas fa-lightbulb"></i>How it Works & Tips</h3>
+                <ul>
+                    <li>Provide a public Spotify playlist URL or ID.</li>
+                    <li>The tool fetches tracks and searches for them on YouTube.</li>
+                    <li>A new YouTube playlist is created with the found songs.</li>
+                    <li>Choose a name or let it default. Select your privacy setting.</li>
+                </ul>
+
+                <h3 class="mt-4"><i class="fas fa-exclamation-triangle"></i>Important Notes</h3>
+                <p>
+                    <strong>API Quotas:</strong> YouTube has daily API usage limits (around 10,000 units). Large playlists (50+ songs) consume significant quota. If errors occur, try again later (quotas reset daily PST).
+                </p>
+                <p>
+                    <strong>YouTube Authorization:</strong> On first use or if your token expires, a browser pop-up will ask you to log in to Google and grant permission for this app to manage your YouTube playlists.
+                </p>
+                <p>
+                    <strong>Song Matching:</strong> The tool tries its best to find official versions or high-quality audio. Match accuracy can vary.
+                </p>
+                 <p>
+                    <strong>Patience is Key:</strong> For large playlists, the process can take several minutes due to API rate limits and searches.
+                </p>
+            </aside>
+        </div>
     </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
     <script>
         const form = document.getElementById('conversionForm');
-        const progressArea = document.getElementById('progressArea');
+        const progressAreaContainer = document.getElementById('progressAreaContainer');
+        const playlistLinkContainer = document.getElementById('playlistLinkContainer');
         const submitButton = document.getElementById('submitButton');
         const ytAuthStatusDiv = document.getElementById('ytAuthStatus');
+        let initialProgressMessageCleared = false;
+        let originalButtonContent = submitButton.innerHTML; // Store initial button content
 
         function escapeHtml(unsafe) {
-            return unsafe
-                 .replace(/&/g, "&")
-                 .replace(/</g, "<")
-                 .replace(/>/g, ">")
-                 .replace(/"/g, "")
-                 .replace(/'/g, "'");
+            if (typeof unsafe !== 'string') return String(unsafe);
+            return unsafe.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, "").replace(/'/g, "'");
         }
-
-        function formatProgressMessage(message) {
-            message = escapeHtml(message); // Sanitize message
-            if (message.toLowerCase().includes("error:")) {
-                if (message.toLowerCase().includes("fatal error:")) {
-                    return `<span class="fatal-error-message">${message}</span>`;
-                }
-                return `<span class="error-message">${message}</span>`;
-            } else if (message.toLowerCase().includes("success") || message.toLowerCase().includes("created!")) {
-                return `<span class="success-message">${message}</span>`;
-            } else if (message.toLowerCase().includes("warning") || message.toLowerCase().includes("skipping") || message.toLowerCase().includes("could not find")) {
-                return `<span class="warning-message">${message}</span>`;
+        
+        function addProgressMessage(messageContent, type = 'info') {
+            if (!initialProgressMessageCleared && progressAreaContainer.firstChild && progressAreaContainer.firstChild.classList.contains('text-muted')) {
+                progressAreaContainer.innerHTML = '';
+                initialProgressMessageCleared = true;
             }
-            return `<span class="info-message">${message}</span>`;
+
+            const p = document.createElement('p');
+            let cssClass = 'progress-message';
+            let iconClass = 'fas fa-info-circle'; 
+
+            // Smart icon selection based on message content
+            if (messageContent.toLowerCase().includes("fatal error:")) { cssClass += ' fatal-error-message'; iconClass = 'fas fa-bomb'; }
+            else if (messageContent.toLowerCase().includes("error:")) { cssClass += ' error-message'; iconClass = 'fas fa-times-circle'; }
+            else if (messageContent.toLowerCase().includes("success") || messageContent.toLowerCase().includes("created!") || messageContent.toLowerCase().includes("complete ---") || messageContent.toLowerCase().includes("successfully added")) { cssClass += ' success-message'; iconClass = 'fas fa-check-circle'; }
+            else if (messageContent.toLowerCase().includes("warning") || messageContent.toLowerCase().includes("skipping") || messageContent.toLowerCase().includes("could not find")) { cssClass += ' warning-message'; iconClass = 'fas fa-exclamation-triangle'; }
+            else if (messageContent.toLowerCase().includes("debug:")) { cssClass += ' debug-message'; iconClass = 'fas fa-bug'; }
+            else if (messageContent.toLowerCase().includes("searching for")) { iconClass = 'fas fa-search'; cssClass += ' info-message'; }
+            else if (messageContent.toLowerCase().includes("fetching tracks") || (messageContent.toLowerCase().includes("found") && messageContent.toLowerCase().includes("tracks"))) { iconClass = 'fas fa-music'; cssClass += ' info-message'; }
+            else if (messageContent.toLowerCase().includes("creating youtube playlist")) { iconClass = 'fab fa-youtube'; cssClass += ' info-message'; }
+            else if (messageContent.toLowerCase().includes("youtube playlist created!")) { iconClass = 'fas fa-list-check'; cssClass += ' success-message'; }
+            else if (messageContent.startsWith("Link: https://www.youtube.com/playlist?list=")) {
+                cssClass += ' success-message'; // Treat link as a success
+                iconClass = 'fas fa-link';
+                const playlistUrl = messageContent.substring(6).trim();
+                displayPlaylistLinkButton(playlistUrl);
+                // Optionally, don't display the raw link text if the button is present
+                // p.innerHTML = `<i class="${iconClass}"></i>Playlist link generated.`;
+                // progressAreaContainer.appendChild(p);
+                // p.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                return; // Don't add the raw link message if button is shown
+            } else { cssClass += ' info-message'; }
+            
+            p.className = cssClass;
+            p.innerHTML = `<i class="${iconClass}"></i>${escapeHtml(messageContent)}`;
+            progressAreaContainer.appendChild(p);
+            p.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
 
+        function displayPlaylistLinkButton(url) {
+            playlistLinkContainer.innerHTML = ''; // Clear previous button
+            const linkMsg = document.createElement('p');
+            linkMsg.innerHTML = `<i class="fas fa-party-popper"></i>Your new YouTube playlist is ready!`; // Font Awesome 6 popper icon
+            
+            const button = document.createElement('a');
+            button.href = url;
+            button.target = "_blank"; // Open in new tab
+            button.className = "btn btn-view-playlist";
+            button.innerHTML = `<i class="fab fa-youtube"></i> View Playlist on YouTube`;
+            
+            playlistLinkContainer.appendChild(linkMsg);
+            playlistLinkContainer.appendChild(button);
+            playlistLinkContainer.style.display = 'block'; // Show the container
+            button.focus(); // For accessibility
+        }
 
         async function checkYouTubeAuth() {
             try {
                 const response = await fetch('/check_auth');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
-                if (data.yt_authorized) {
-                    ytAuthStatusDiv.innerHTML = 'YouTube appears to be authorized. <span class="success-message">(token.json found)</span>';
-                    ytAuthStatusDiv.className = 'auth-status authorized';
-                } else {
-                    ytAuthStatusDiv.innerHTML = 'YouTube authorization not detected. <span class="warning-message">(token.json not found)</span> You may need to authorize during the first conversion attempt.';
-                    ytAuthStatusDiv.className = 'auth-status not-authorized';
-                }
+                
+                ytAuthStatusDiv.classList.remove('alert-success', 'alert-warning', 'alert-danger');
+                let icon = data.yt_authorized ? 'fa-check-circle' : 'fa-user-lock'; // User-lock if not authorized
+                let statusText = data.yt_authorized ? '<strong>YouTube Authorized:</strong> Ready to convert.' : '<strong>YouTube Not Authorized:</strong> Authorization required on first conversion.';
+                
+                ytAuthStatusDiv.innerHTML = `<i class="fas ${icon} me-2"></i> ${statusText}`;
+                ytAuthStatusDiv.classList.add(data.yt_authorized ? 'alert-success' : 'alert-warning');
             } catch (error) {
                 console.error('Error checking YouTube auth:', error);
-                ytAuthStatusDiv.innerHTML = 'Could not check YouTube authorization status. <span class="error-message">(Error connecting to server)</span>';
-                ytAuthStatusDiv.className = 'auth-status not-authorized';
+                ytAuthStatusDiv.classList.remove('alert-success', 'alert-warning', 'alert-danger');
+                ytAuthStatusDiv.innerHTML = '<i class="fas fa-shield-virus me-2"></i><strong>Auth Check Failed:</strong> Cannot verify YouTube status.';
+                ytAuthStatusDiv.classList.add('alert-danger');
             }
         }
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
-            progressArea.innerHTML = '<span class="info-message">Starting conversion...</span>\n';
+            progressAreaContainer.innerHTML = ''; 
+            playlistLinkContainer.style.display = 'none'; // Hide previous link button
+            playlistLinkContainer.innerHTML = ''; // Clear it
+            initialProgressMessageCleared = false; 
+            addProgressMessage('🚀 Initiating conversion process...');
+            
             submitButton.disabled = true;
-            submitButton.textContent = 'Converting... Please Wait';
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Processing...
+            `;
 
             const formData = new FormData(form);
-
             try {
-                const response = await fetch('/convert', {
-                    method: 'POST',
-                    body: formData // FormData is fine for POST, no need to URLSearchParams here
-                });
-
-                if (!response.ok) { // Handle initial HTTP errors from the server before streaming starts
-                    const errorText = await response.text();
-                    progressArea.innerHTML += formatProgressMessage(`Error starting conversion: ${response.status} ${escapeHtml(errorText)}\n`);
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Convert Playlist';
+                const response = await fetch('/convert', { method: 'POST', body: formData });
+                if (!response.ok) {
+                    addProgressMessage(`Error: ${response.status} - ${await response.text()}`, 'error');
                     return;
                 }
 
                 const reader = response.body.getReader();
-                const decoder = new TextDecoder(); //
+                const decoder = new TextDecoder();
                 let buffer = '';
 
                 while (true) {
                     const { value, done } = await reader.read();
                     if (done) {
-                        if (buffer.length > 0) { // Process any remaining data in buffer
-                             progressArea.innerHTML += formatProgressMessage(buffer); // No 'data: ' prefix for final buffer part
-                        }
-                        progressArea.innerHTML += '<span class="success-message">\nStream finished.</span>\n';
+                        if (buffer.length > 0) addProgressMessage(buffer.trim());
                         break;
                     }
-                    
                     buffer += decoder.decode(value, { stream: true });
                     let eolIndex;
-                    // SSE messages are separated by double newlines "\n\n"
                     while ((eolIndex = buffer.indexOf('\n\n')) >= 0) {
-                        const line = buffer.substring(0, eolIndex);
-                        buffer = buffer.substring(eolIndex + 2); // Consume the message and the delimiter
-
-                        if (line.startsWith('data: ')) {
-                            const message = line.substring(6).trim(); // Get content after 'data: '
-                            if (message === 'END_OF_STREAM') {
-                                progressArea.innerHTML += '<span class="success-message">\nConversion process ended by server.</span>\n';
-                                checkYouTubeAuth(); // Update auth status
-                                submitButton.disabled = false;
-                                submitButton.textContent = 'Convert Playlist';
-                                return; // Exit loop as stream is effectively over
+                        const rawMessage = buffer.substring(0, eolIndex);
+                        buffer = buffer.substring(eolIndex + 2); 
+                        if (rawMessage.startsWith('data: ')) {
+                            const messageContent = rawMessage.substring(6).trim();
+                            if (messageContent === 'END_OF_STREAM') {
+                                addProgressMessage('✅ Conversion process completed by server.');
+                                checkYouTubeAuth(); 
+                                return; 
                             }
-                            progressArea.innerHTML += formatProgressMessage(message + '\n');
-                        } else if (line.trim().length > 0) { // Handle non-SSE lines if any (though server should stick to SSE)
-                             progressArea.innerHTML += formatProgressMessage(line.trim() + '\n');
+                            addProgressMessage(messageContent);
+                        } else if (rawMessage.trim().length > 0) { 
+                             addProgressMessage(rawMessage.trim());
                         }
                     }
-                    progressArea.scrollTop = progressArea.scrollHeight; // Auto-scroll
                 }
             } catch (error) {
-                console.error('Error during conversion stream:', error);
-                progressArea.innerHTML += formatProgressMessage(`\nNetwork or Stream Error during conversion: ${escapeHtml(error.message)}\n`);
+                addProgressMessage(`Network or Stream Error: ${error.message}`, 'error');
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = 'Convert Playlist';
-                checkYouTubeAuth(); // Update auth status
+                submitButton.innerHTML = originalButtonContent;
+                checkYouTubeAuth(); 
             }
         });
-
-        // Check auth on page load
-        checkYouTubeAuth();
+        checkYouTubeAuth(); // Initial check
     </script>
 </body>
 </html>
